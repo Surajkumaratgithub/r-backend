@@ -52,21 +52,23 @@ const deletFilesFromCloudinary = async (public_ids) => {
   // Delete files from cloudinary
 };
 const allowedOrigins = [
-  process.env.CLIENT_URL, // Remove trailing slash
-  "https://rupkala-iota.vercel.app",
-  "http://localhost:5173",
+  process.env.CLIENT_URL,
 ];
 
 const corsOptions = {
   origin: (origin, callback) => {
+    // Allow requests with no origin (e.g., Razorpay webhooks)
     if (!origin || allowedOrigins.some((allowed) => origin.startsWith(allowed))) {
       callback(null, true);
+    } else if (origin?.includes("razorpay")) {
+      callback(null, true); // Allow Razorpay webhook requests
     } else {
       callback(new Error("Not allowed by CORS"));
     }
   },
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true, // Allows cookies and authentication headers
+  allowedHeaders: ["Content-Type", "Authorization"], // Allow necessary headers
 };
 export {
   connectDB,
